@@ -17,6 +17,7 @@ import (
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/def"
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/extapi"
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/flags"
+	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/goadmin"
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/goose"
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/memdb"
 	"github.com/DiaElectronics/lea-central-wash/cmd/storage/internal/migration"
@@ -199,6 +200,8 @@ func run(db *sqlx.DB, errc chan<- error) {
 
 	kasse := svckasse.New(cfg.kasse)
 	appl := app.New(repo, kasse)
+	go goadmin.StartAdmin(cfg.db)
+	goadmin.Repo = repo
 
 	extsrv, err := extapi.NewServer(appl, cfg.extapi, repo)
 	if err != nil {
